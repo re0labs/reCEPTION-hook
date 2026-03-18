@@ -1,0 +1,16 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+	ignorecase = true
+	precomposeunicode = true
+[submodule "lib/forge-std"]
+	url = https://github.com/foundry-rs/forge-std
+	active = true
+[submodule "lib/v4-hooks-public"]
+	url = https://github.com/Uniswap/v4-hooks-public
+	active = true
+[submodule "lib/reactive-lib"]
+	url = https://github.com/Reactive-Network/reactive-lib
+	active = true
