@@ -275,6 +275,7 @@ hook.oracleFulfill(requestId, "SAFE")
 Install dependencies and run tests using **Foundry**.
 
 ```shell
+cd contracts
 forge install
 forge test
 ```
@@ -283,7 +284,7 @@ forge test
 
 # Project Structure
 
-src/  
+src/contracts
 ├ reCEPTIONHook.sol  
 ├ SecurityRegistry.sol  
 ├ interfaces/  
