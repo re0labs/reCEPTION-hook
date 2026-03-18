@@ -284,13 +284,14 @@ forge test
 
 # Project Structure
 
-src/contracts  
+contracts/
+└ src/
 ├ reCEPTIONHook.sol  
 ├ SecurityRegistry.sol  
 ├ interfaces/  
 └ reactive/
 
-test/  
+└ test/  
 ├ reCEPTIONHook.t.sol  
 └ mocks/
 
