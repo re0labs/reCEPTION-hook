@@ -284,8 +284,8 @@ forge test
 
 # Project Structure
 
-contracts/
-└ src/
+contracts/  
+└ src/  
 ├ reCEPTIONHook.sol  
 ├ SecurityRegistry.sol  
 ├ interfaces/  
