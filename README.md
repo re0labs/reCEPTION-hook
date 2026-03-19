@@ -231,5 +231,3 @@ As DeFi scales, security must:
 * be autonomous
 
 reCEPTION is building that layer.
-
-까지 이어서 만들어줄게.
