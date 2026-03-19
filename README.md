@@ -18,7 +18,7 @@ reCEPTION changes this.
 
 reCEPTION is a **security-first Uniswap v4 Hook** that embeds protection **directly inside the swap execution path**, transforming DEX infrastructure from passive liquidity into **actively defended systems**.
 
-## The Core Idea
+## The Core Solution
 
 Most security tools **analyze after interaction**.
 
