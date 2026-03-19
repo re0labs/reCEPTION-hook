@@ -14,3 +14,6 @@
 [submodule "lib/reactive-lib"]
 	url = https://github.com/Reactive-Network/reactive-lib
 	active = true
+[submodule "lib/v4-periphery"]
+	url = https://github.com/Uniswap/v4-periphery
+	active = true

@@ -308,10 +308,7 @@ contract reCEPTIONHook is BaseHook {
 
         oracleRequestsThisBlock++;
 
-        bytes32 requestId = reception.hookRequestAnalysis(
-            target,
-            address(this)
-        );
+        bytes32 requestId = reception.hookRequestAnalysis(target, address(0));
 
         requestTarget[requestId] = target;
 
@@ -334,11 +331,11 @@ contract reCEPTIONHook is BaseHook {
 
         SecurityRegistry.SecurityStatus status;
 
-        if (hash == keccak256("MALICIOUS")) {
+        if (hash == keccak256(bytes("MALICIOUS"))) {
             status = SecurityRegistry.SecurityStatus.MALICIOUS;
-        } else if (hash == keccak256("HIGH_RISK")) {
+        } else if (hash == keccak256(bytes("HIGH_RISK"))) {
             status = SecurityRegistry.SecurityStatus.HIGH_RISK;
-        } else if (hash == keccak256("SUSPICIOUS")) {
+        } else if (hash == keccak256(bytes("SUSPICIOUS"))) {
             status = SecurityRegistry.SecurityStatus.SUSPICIOUS;
         } else {
             status = SecurityRegistry.SecurityStatus.SAFE;
@@ -356,7 +353,6 @@ contract reCEPTIONHook is BaseHook {
 
         delete requestTarget[requestId];
 
-        //CROSS CHAIN SIGNAL
         emit ThreatBroadcast(target, uint8(status));
     }
 
