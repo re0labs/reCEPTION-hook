@@ -1,344 +1,235 @@
 # reCEPTION Hook
 
-## Cross-Chain Security Firewall for Uniswap v4
+### Cross-Chain Security Firewall for Uniswap v4
 
-reCEPTION is a **security-first Uniswap v4 Hook** that protects decentralized exchanges from malicious tokens, compromised routers, and risky smart contracts.
+#### [Website](https://reception.re-labs.io/) | [Pitchdeck](https://drive.google.com/file/d/1EzFJzVdejq8URAUaYuzT9ZngMDU1ovjZ/view?usp=sharing) | [Demo Video]()
 
-The hook integrates with the **reCEPTION AI security oracle** to analyze smart contracts interacting with pools and dynamically adjusts behavior to:
+## Overview
 
-- block malicious assets
-- quarantine risky tokens
-- dynamically adjust swap fees
-- limit unknown tokens
-- propagate threats across chains
+DeFi has unlocked permissionless finance.
+But it also introduced a critical flaw:
 
-When a malicious contract is detected, **all pools using that token are automatically frozen**, and the threat intelligence is broadcast across chains using Reactive Network.
+**Every contract is treated as trustworthy until it exploits users.**
 
----
+Malicious tokens, compromised routers, and hidden backdoors can interact with DEX pools without restriction.
+By the time risks are identified, **the loss has already occurred**.
 
-# Problem
+reCEPTION changes this.
 
-DeFi users are constantly exposed to:
+reCEPTION is a **security-first Uniswap v4 Hook** that embeds protection **directly inside the swap execution path**, transforming DEX infrastructure from passive liquidity into **actively defended systems**.
 
-- malicious tokens
-- rug pulls
-- proxy contract upgrades
-- compromised routers
-- hidden backdoors
-- honeypots
+## The Core Idea
 
-Most DEXs treat **all tokens equally**, meaning malicious contracts can freely create pools and exploit users.
+Most security tools **analyze after interaction**.
 
-reCEPTION introduces a **security layer directly inside the DEX swap path**.
+reCEPTION **intervenes before execution**.
 
----
+Instead of warning users externally, reCEPTION enforces security **at the protocol level**:
 
-# Solution
+* before swaps happen
+* before liquidity is added
+* before damage is possible
 
-reCEPTION is a **Uniswap v4 Hook security firewall** that evaluates contracts interacting with pools and dynamically applies security policies.
+This is not a dashboard.
+This is **execution-layer security**.
 
-The hook:
+## What reCEPTION Does
 
-✔ scans tokens and routers  
-✔ dynamically adjusts swap fees  
-✔ blocks malicious contracts  
-✔ freezes compromised pools  
-✔ limits unknown tokens  
-✔ propagates threats cross-chain
+reCEPTION acts as a **real-time security firewall** for DEX pools.
 
----
+It continuously evaluates every contract interacting with liquidity pools and dynamically enforces security policies.
 
-# Architecture
+### Core Capabilities
 
-Trader  
- │  
- ▼  
-Swap Router  
-│  
-▼  
-Uniswap Pool Manager  
-│  
-▼  
-reCEPTIONHook  
-│  
-├── SecurityRegistry  
-│  
-├── AI Security Oracle  
-│  
-└── Cross-Chain Threat Broadcast  
-│  
-▼  
-Reactive Network  
-│  
-▼  
-Other Chains Update Registry
+* Blocks malicious tokens before swaps execute
+* Freezes pools when threats are detected
+* Dynamically adjusts fees based on risk
+* Limits exposure to unknown contracts
+* Detects contract upgrades or tampering
+* Shares threat intelligence across chains
 
-The hook sits directly inside the **swap execution path**.
+## How It Works (Execution Flow)
 
-Every interaction is evaluated before execution.
+reCEPTION sits directly inside the **Uniswap v4 Hook lifecycle**, intercepting every critical interaction.
 
----
+```mermaid
+sequenceDiagram
+    participant User
+    participant Router
+    participant PoolManager
+    participant reCEPTIONHook
+    participant SecurityRegistry
+    participant AIOracle
+    participant ReactiveNetwork
 
-# Security Model
+    User->>Router: Initiate Swap
+    Router->>PoolManager: Forward Swap
+    PoolManager->>reCEPTIONHook: beforeSwap()
 
-Each contract interacting with a pool is classified as:
+    reCEPTIONHook->>SecurityRegistry: Check Token Status
+    reCEPTIONHook->>AIOracle: Request Analysis (if needed)
 
-| Status     | Behavior          |
-| ---------- | ----------------- |
-| SAFE       | normal fees       |
-| SUSPICIOUS | elevated fees     |
-| HIGH_RISK  | swaps blocked     |
-| MALICIOUS  | pools frozen      |
-| UNKNOWN    | swap size limited |
+    AIOracle-->>reCEPTIONHook: Risk Classification
 
-These classifications are determined by the **reCEPTION AI analysis engine**.
+    alt SAFE
+        reCEPTIONHook-->>PoolManager: Allow Swap (normal fee)
+    else SUSPICIOUS
+        reCEPTIONHook-->>PoolManager: Allow Swap (high fee)
+    else UNKNOWN
+        reCEPTIONHook-->>PoolManager: Limit Swap Size
+    else HIGH_RISK
+        reCEPTIONHook-->>PoolManager: Block Swap
+    else MALICIOUS
+        reCEPTIONHook->>SecurityRegistry: Freeze Pools
+        reCEPTIONHook->>ReactiveNetwork: Broadcast Threat
+        reCEPTIONHook-->>PoolManager: Block Swap
+    end
 
----
-
-# Hook Lifecycle
-
-The hook uses the following **Uniswap v4 hook points**.
-
-## beforeInitialize
-
-Ensures the pool uses **dynamic fees**.
-
-```shell
-MustUseDynamicFee()
+    PoolManager-->>Router: Result
+    Router-->>User: Transaction Outcome
 ```
 
----
+## Architecture
 
-## afterInitialize
+reCEPTION is built as a **layered security system embedded in execution flow**.
 
-When a pool is created:
+```mermaid
+sequenceDiagram
+    participant Trader
+    participant Router
+    participant PoolManager
+    participant Hook
+    participant Oracle
+    participant Registry
+    participant CrossChain
 
-- both tokens are registered
-- analysis is requested
-- pool-token mappings are stored
+    Trader->>Router: Trade Request
+    Router->>PoolManager: Execute Swap
+    PoolManager->>Hook: Hook Trigger
 
-```shell
-_requestAnalysis(token)
+    Hook->>Registry: Query Status
+    Hook->>Oracle: Analyze Contract
+
+    Oracle-->>Hook: Risk Result
+    Hook->>Registry: Update Status
+
+    Hook->>CrossChain: Broadcast Threat
+
+    Hook-->>PoolManager: Enforce Policy
+    PoolManager-->>Router: Execution Result
 ```
 
----
+## Security Model
 
-## beforeAddLiquidity
+Every interacting contract is classified in real time:
 
-Liquidity is only allowed when both tokens are **SAFE**.
+| Status     | Meaning                     | Action           |
+| ---------- | --------------------------- | ---------------- |
+| SAFE       | Verified and trusted        | Normal execution |
+| SUSPICIOUS | Potential risk              | Higher fees      |
+| UNKNOWN    | Not yet analyzed            | Limited exposure |
+| HIGH_RISK  | Dangerous behavior detected | Swap blocked     |
+| MALICIOUS  | Confirmed threat            | Pools frozen     |
 
-This prevents liquidity providers from accidentally depositing funds into unsafe pools.
+## Key Mechanisms
 
----
+### Dynamic Security Fees
 
-## beforeSwap
+Risk directly impacts execution cost.
 
-This is the core firewall.
+* Safe → low fee
+* Suspicious → higher fee
+* Unknown → restricted + high fee
+* Malicious → blocked
 
-Before every swap the hook checks:
+This introduces **economic deterrence at protocol level**.
 
-- router security
-- token security
-- contract integrity
-- analysis state
-- swap limits
+### Contract Integrity Protection
 
-Possible results:
+Smart contracts can change via proxy upgrades.
 
-- swap allowed
-- swap rejected
-- dynamic fee applied
-- analysis triggered
+reCEPTION prevents this by:
 
----
+* storing analyzed code hash
+* comparing at execution time
+* reverting on mismatch
 
-# Dynamic Security Fees
+This eliminates **post-audit exploit vectors**.
 
-Fees adjust automatically depending on token risk.
+### Pool Freeze System
 
-| Status     | Fee     |
-| ---------- | ------- |
-| SAFE       | 0.3%    |
-| SUSPICIOUS | 0.8%    |
-| UNKNOWN    | 1.5%    |
-| HIGH_RISK  | blocked |
-| MALICIOUS  | blocked |
+When a token is classified as malicious:
 
-Unknown tokens also have **swap size limits**.
+* all pools using that token are frozen
+* swaps are disabled instantly
+* manual or automated review required
 
-```shell
-UNKNOWN_MAX_SWAP = 10 ETH
+This prevents **systemic liquidity attacks**.
+
+### Cross-Chain Threat Intelligence
+
+Threats don’t stay isolated.
+
+reCEPTION ensures they don’t.
+
+```mermaid
+sequenceDiagram
+    participant ChainA
+    participant HookA
+    participant ReactiveNetwork
+    participant HookB
+    participant ChainB
+
+    HookA->>ReactiveNetwork: Broadcast MALICIOUS Token
+    ReactiveNetwork->>HookB: Propagate Threat
+    HookB->>ChainB: Update Registry
 ```
 
-This prevents large trades against unverified contracts.
+If a malicious token is detected on one chain:
 
----
+→ it is **blocked across all integrated chains**
 
-# Contract Integrity Protection
+## Why This Matters
 
-To prevent **proxy upgrades or code replacement attacks**, the hook stores the analyzed code hash.
+Today’s DeFi security model is reactive:
 
-```shell
-analyzedCodeHash[token]
-```
+* audits happen too early
+* dashboards act too late
+* users bear the risk
 
-If a token changes its code after being analyzed, swaps revert immediately.
+reCEPTION introduces a new model:
 
----
+**Security enforced at execution.**
 
-# Pool Freeze Mechanism
+This transforms DEXs into:
 
-If a contract is classified as **MALICIOUS**, all pools using that token are frozen.
+* self-defending systems
+* risk-aware liquidity infrastructure
+* cross-chain security networks
 
-```shell
-_freezeAllPools(token)
-```
+## Key Benefits
 
-Every affected pool will have swaps permanently disabled until manual review.
+* Protects traders from malicious tokens
+* Protects LPs from rug pulls
+* Reduces protocol-level attack surface
+* Introduces real-time risk pricing
+* Automates threat containment
+* Enables cross-chain defense
 
----
+## Vision
 
-# Oracle Integration
+reCEPTION is not just a hook.
 
-The hook communicates with the **reCEPTION AI analysis oracle**.
+It is the foundation of a new category:
 
-When a new contract interacts with a pool:
+**Execution-Level Security Infrastructure for Web3**
 
-```shell
-hookRequestAnalysis(target)
-```
+As DeFi scales, security must:
 
-The oracle evaluates the contract and returns:
+* be embedded
+* be real-time
+* be autonomous
 
-```shell
-SAFE
-SUSPICIOUS
-HIGH_RISK
-MALICIOUS
-```
+reCEPTION is building that layer.
 
-The hook processes the result via:
-
-```shell
-oracleFulfill(requestId, result)
-```
-
----
-
-# Cross-Chain Threat Intelligence
-
-When a malicious contract is detected, the hook emits:
-
-ThreatBroadcast(token, status)
-
-This event is monitored by **Reactive Network**, which propagates the threat to other chains.
-
-Other chains then update their registries automatically.
-
-```shell
-registry.updateStatus(token, MALICIOUS)
-```
-
-Result:
-
-If a malicious token is detected on **one chain**, it becomes blocked across **all chains running reCEPTION**.
-
-This creates a **cross-chain DeFi security network**.
-
----
-
-# Testing
-
-The repository includes extensive Foundry tests validating:
-
-- pool initialization
-- security analysis requests
-- liquidity restrictions
-- swap validation
-- dynamic fee logic
-- swap size limits
-- malicious token blocking
-- high risk token blocking
-
-Tests simulate the oracle callback using a mock oracle.
-
-Example:
-
-```shell
-hook.oracleFulfill(requestId, "SAFE")
-```
-
----
-
-# Running Tests
-
-Install dependencies and run tests using **Foundry**.
-
-```shell
-cd contracts
-forge install
-forge test
-```
-
----
-
-# Project Structure
-
-contracts/  
-└ src/  
-├ reCEPTIONHook.sol  
-├ SecurityRegistry.sol  
-├ interfaces/  
-└ reactive/
-
-└ test/  
-├ reCEPTIONHook.t.sol  
-└ mocks/
-
-The `reactive` folder contains contracts used for cross-chain threat propagation.
-
----
-
-# Why This Matters
-
-DeFi currently lacks **native security infrastructure**.
-
-reCEPTION transforms DEX pools into **self-defending liquidity infrastructure**.
-
-Instead of relying on off-chain warnings, the protocol itself enforces security policies.
-
----
-
-# Key Benefits
-
-✔ protects traders from malicious tokens  
-✔ protects LPs from rug pulls  
-✔ reduces attack surface for routers  
-✔ introduces dynamic risk pricing  
-✔ automatically quarantines threats  
-✔ shares threat intelligence across chains
-
----
-
-# Future Improvements
-
-- risk score based fees
-- decentralized security oracle network
-- cross-DEX threat registry
-- automated LP migration from compromised pools
-- on-chain threat reputation system
-
----
-
-# Conclusion
-
-reCEPTION transforms Uniswap v4 hooks into a **DeFi security firewall**.
-
-By combining:
-
-- AI contract analysis
-- dynamic fee enforcement
-- pool quarantine
-- cross-chain threat intelligence
-
-reCEPTION creates the first **autonomous cross-chain DEX security network**.
+까지 이어서 만들어줄게.
